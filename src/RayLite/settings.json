@@ -1,0 +1,14 @@
+{
+  "hotkey": "Ctrl+Space",
+  "runOnStartup": false,
+  "indexDefaultFolders": true,
+  "includedFolders": [],
+  "excludedFolders": [
+    "node_modules",
+    ".git",
+    ".vs",
+    "__pycache__"
+  ],
+  "maxIndexedFiles": 15000,
+  "maxDepth": 6
+}
