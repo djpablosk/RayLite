@@ -11,45 +11,61 @@ public sealed class SearchEngine
     /// <summary>Atomically swaps the index; searches in flight keep using the old array.</summary>
     public void SetIndex(IndexEntry[] entries) => _entries = entries;
 
+    /// <summary>One scored match. Ranking is the composite key (IsApp, Score, NameLength, PathLength).</summary>
+    private readonly record struct Candidate(bool IsApp, int Score, int NameLength, int PathLength, IndexEntry Entry);
+
+    /// <summary>
+    /// Returns up to <paramref name="maxResults"/> matches ordered by:
+    /// 1) applications before everything else, 2) match score (exact &gt; prefix &gt; substring &gt; subsequence/typo),
+    /// 3) shorter name, 4) shorter path. Files and folders only fill slots left over after all matching apps.
+    /// </summary>
     public List<IndexEntry> Search(string query, int maxResults)
     {
         string q = query.Trim().ToLowerInvariant();
-        var top = new List<(int Score, IndexEntry Entry)>(maxResults + 1);
-        if (q.Length == 0) return new List<IndexEntry>();
+        if (q.Length == 0 || maxResults <= 0) return new List<IndexEntry>();
 
         string compact = q.Contains(' ') ? q.Replace(" ", string.Empty) : q;
         IndexEntry[] entries = _entries;
+        var top = new List<Candidate>(maxResults + 1);
 
         foreach (IndexEntry entry in entries)
         {
             bool isApp = entry.Kind is EntryKind.Application or EntryKind.UwpApp;
+
+            // Once the list is full of apps, no file/folder can ever displace one: skip scoring them entirely.
+            if (!isApp && top.Count == maxResults && top[^1].IsApp) continue;
+
             int score = FuzzyMatcher.Score(q, compact, entry.Name, isApp);
             if (score <= 0) continue;
 
-            score += entry.Kind switch
-            {
-                EntryKind.Application => 60,
-                EntryKind.UwpApp => 60,
-                EntryKind.Folder => 10,
-                _ => 0
-            };
+            var candidate = new Candidate(isApp, score, entry.Name.Length, entry.Path.Length, entry);
 
-            if (top.Count == maxResults && score <= top[^1].Score) continue;
+            if (top.Count == maxResults && !IsBetter(candidate, top[^1])) continue;
 
             int i = top.Count;
-            while (i > 0 && top[i - 1].Score < score) i--;
-            top.Insert(i, (score, entry));
+            while (i > 0 && IsBetter(candidate, top[i - 1])) i--;
+            top.Insert(i, candidate);
             if (top.Count > maxResults) top.RemoveAt(top.Count - 1);
         }
 
         var result = new List<IndexEntry>(top.Count);
-        foreach (var item in top) result.Add(item.Entry);
+        foreach (Candidate c in top) result.Add(c.Entry);
         return result;
+    }
+
+    /// <summary>Strict ordering; ties keep index order (earlier entries win).</summary>
+    private static bool IsBetter(in Candidate a, in Candidate b)
+    {
+        if (a.IsApp != b.IsApp) return a.IsApp;
+        if (a.Score != b.Score) return a.Score > b.Score;
+        if (a.NameLength != b.NameLength) return a.NameLength < b.NameLength;
+        return a.PathLength < b.PathLength;
     }
 }
 
 /// <summary>
-/// Scoring tiers: exact (1000) > prefix (800) > substring (300-650) > subsequence (1-299) > typo-tolerant (≤150, apps only).
+/// Match-quality tiers (length is deliberately NOT part of the score; it is a separate ranking key):
+/// exact 1000 &gt; prefix 800 &gt; substring 400–650 &gt; subsequence 1–299 / typo-tolerant (apps only) ≤150.
 /// </summary>
 internal static class FuzzyMatcher
 {
@@ -61,10 +77,9 @@ internal static class FuzzyMatcher
         int idx = text.IndexOf(q, StringComparison.OrdinalIgnoreCase);
         if (idx >= 0)
         {
-            int lengthPenalty = Math.Min(text.Length - q.Length, 100);
-            if (idx == 0) return (text.Length == q.Length ? 1000 : 800) - lengthPenalty;
+            if (idx == 0) return text.Length == q.Length ? 1000 : 800;
             int boundaryBonus = IsBoundary(text, idx) ? 150 : 0;
-            return 500 + boundaryBonus - Math.Min(idx, 100) - lengthPenalty;
+            return 500 + boundaryBonus - Math.Min(idx, 100);
         }
 
         // 2. Subsequence ("vsc" -> "Visual Studio Code")
@@ -88,7 +103,7 @@ internal static class FuzzyMatcher
             }
 
             if (qi == compact.Length && last - first + 1 <= compact.Length * 3 + 2)
-                return Math.Clamp(score - (text.Length - compact.Length), 1, 299);
+                return Math.Clamp(score, 1, 299);
         }
 
         // 3. Typo tolerance (transpositions, substitutions, single insert/delete) for app names
