@@ -7,6 +7,9 @@ public sealed class AppSettings
     public string Hotkey { get; set; } = "Ctrl+Space";
     public bool RunOnStartup { get; set; }
 
+    /// <summary>Ignore the global hotkey while a fullscreen app/game/video is in the foreground.</summary>
+    public bool IgnoreFullscreen { get; set; } = true;
+
     /// <summary>Index Documents, Desktop and Downloads automatically.</summary>
     public bool IndexDefaultFolders { get; set; } = true;
 
@@ -24,6 +27,7 @@ public sealed class AppSettings
     {
         Hotkey = Hotkey,
         RunOnStartup = RunOnStartup,
+        IgnoreFullscreen = IgnoreFullscreen,
         IndexDefaultFolders = IndexDefaultFolders,
         IncludedFolders = new List<string>(IncludedFolders),
         ExcludedFolders = new List<string>(ExcludedFolders),

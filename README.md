@@ -50,6 +50,7 @@ Download `RayLite.exe` from the Releases page and run it from anywhere. Settings
 Open **Settings** from the tray menu to change:
 - the global **hotkey** (click the box and press a new combination),
 - **Run on startup** (writes `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`),
+- **Disable hotkey in fullscreen apps / games** (on by default; checked only at the moment you press the hotkey — no background timers),
 - **included / excluded folders** (an excluded entry can be a folder name like `node_modules`, or a full path),
 - the **index size limit**.
 
@@ -59,6 +60,7 @@ Everything is stored in `%APPDATA%\RayLite\settings.json`:
 {
   "hotkey": "Ctrl+Space",
   "runOnStartup": false,
+  "ignoreFullscreen": true,
   "indexDefaultFolders": true,
   "includedFolders": [],
   "excludedFolders": ["node_modules", ".git", ".vs", "__pycache__"],

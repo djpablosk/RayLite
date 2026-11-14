@@ -14,6 +14,7 @@ public sealed class SettingsViewModel : ViewModelBase
 
     private string _hotkey;
     private bool _runOnStartup;
+    private bool _ignoreFullscreen;
     private bool _indexDefaultFolders;
     private int _maxIndexedFiles;
     private string _newExclusion = string.Empty;
@@ -30,6 +31,7 @@ public sealed class SettingsViewModel : ViewModelBase
 
         _hotkey = current.Hotkey;
         _runOnStartup = current.RunOnStartup;
+        _ignoreFullscreen = current.IgnoreFullscreen;
         _indexDefaultFolders = current.IndexDefaultFolders;
         _maxIndexedFiles = current.MaxIndexedFiles;
         IncludedFolders = new ObservableCollection<string>(current.IncludedFolders);
@@ -74,6 +76,7 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public string Hotkey { get => _hotkey; set => SetProperty(ref _hotkey, value); }
     public bool RunOnStartup { get => _runOnStartup; set => SetProperty(ref _runOnStartup, value); }
+    public bool IgnoreFullscreen { get => _ignoreFullscreen; set => SetProperty(ref _ignoreFullscreen, value); }
     public bool IndexDefaultFolders { get => _indexDefaultFolders; set => SetProperty(ref _indexDefaultFolders, value); }
     public int MaxIndexedFiles { get => _maxIndexedFiles; set => SetProperty(ref _maxIndexedFiles, value); }
     public string NewExclusion { get => _newExclusion; set => SetProperty(ref _newExclusion, value); }
@@ -112,6 +115,7 @@ public sealed class SettingsViewModel : ViewModelBase
         {
             Hotkey = Hotkey,
             RunOnStartup = RunOnStartup,
+            IgnoreFullscreen = IgnoreFullscreen,
             IndexDefaultFolders = IndexDefaultFolders,
             IncludedFolders = IncludedFolders.ToList(),
             ExcludedFolders = ExcludedFolders.ToList(),

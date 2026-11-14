@@ -62,7 +62,7 @@ public partial class App : Application
         }));
 
         _hotKeys = new HotKeyManager();
-        _hotKeys.HotKeyPressed += () => _mainWindow?.Toggle();
+        _hotKeys.HotKeyPressed += OnHotKeyPressed;
         if (!_hotKeys.TryRegister(_settings.Hotkey, out string error))
         {
             MessageBox.Show(
@@ -90,6 +90,25 @@ public partial class App : Application
             _mutex.Dispose();
         }
         base.OnExit(e);
+    }
+
+    /// <summary>
+    /// The launcher can always be hidden with the hotkey; showing it is skipped while a fullscreen app/game/video
+    /// has the foreground (checked only at this exact moment: no timers, no hooks).
+    /// </summary>
+    private void OnHotKeyPressed()
+    {
+        if (_mainWindow == null) return;
+
+        if (_mainWindow.IsVisible)
+        {
+            _mainWindow.HideLauncher();
+            return;
+        }
+
+        if (_settings.IgnoreFullscreen && FullscreenDetector.IsFullscreenAppActive()) return;
+
+        _mainWindow.ShowLauncher();
     }
 
     private void ShowSettings()

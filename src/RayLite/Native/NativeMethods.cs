@@ -92,6 +92,31 @@ internal static class NativeMethods
     [DllImport("kernel32.dll")]
     public static extern uint GetCurrentThreadId();
 
+    // ---- Fullscreen detection ----
+    public const int GWL_STYLE = -16;
+    public const uint WS_CAPTION = 0x00C00000;
+
+    [DllImport("shell32.dll")]
+    public static extern int SHQueryUserNotificationState(out int pquns);
+
+    [DllImport("user32.dll")]
+    public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetDesktopWindow();
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetShellWindow();
+
+    [DllImport("user32.dll", EntryPoint = "GetWindowLongW")]
+    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+    [DllImport("user32.dll", EntryPoint = "GetClassNameW", CharSet = CharSet.Unicode)]
+    public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
     // ---- Icons / shell ----
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     public static extern IntPtr ExtractAssociatedIconW(IntPtr hInst, StringBuilder lpIconPath, ref ushort lpiIcon);

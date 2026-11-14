@@ -1,6 +1,7 @@
 {
   "hotkey": "Ctrl+Space",
   "runOnStartup": false,
+  "ignoreFullscreen": true,
   "indexDefaultFolders": true,
   "includedFolders": [],
   "excludedFolders": [

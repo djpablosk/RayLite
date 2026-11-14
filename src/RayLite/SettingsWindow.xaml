@@ -72,6 +72,7 @@
 
             <TextBlock Text="General" Style="{StaticResource Heading}" />
             <CheckBox Content="Run RayLite when Windows starts" IsChecked="{Binding RunOnStartup}" />
+            <CheckBox Content="Disable hotkey in fullscreen apps / games" IsChecked="{Binding IgnoreFullscreen}" />
 
             <TextBlock Text="Search folders" Style="{StaticResource Heading}" />
             <CheckBox Content="Index Documents, Desktop and Downloads" IsChecked="{Binding IndexDefaultFolders}" Margin="0,0,0,8" />
