@@ -92,6 +92,42 @@ internal static class NativeMethods
     [DllImport("kernel32.dll")]
     public static extern uint GetCurrentThreadId();
 
+    // ---- System commands ----
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool LockWorkStation();
+
+    [DllImport("powrprof.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static extern bool SetSuspendState(
+        [MarshalAs(UnmanagedType.U1)] bool bHibernate,
+        [MarshalAs(UnmanagedType.U1)] bool bForce,
+        [MarshalAs(UnmanagedType.U1)] bool bWakeupEventsDisabled);
+
+    public const uint SHERB_NOCONFIRMATION = 0x00000001;
+    public const uint SHERB_NOPROGRESSUI = 0x00000002;
+    public const uint SHERB_NOSOUND = 0x00000004;
+
+    [DllImport("shell32.dll", EntryPoint = "SHEmptyRecycleBinW", CharSet = CharSet.Unicode)]
+    public static extern int SHEmptyRecycleBin(IntPtr hwnd, string? pszRootPath, uint dwFlags);
+
+    [DllImport("user32.dll", EntryPoint = "MessageBoxW", CharSet = CharSet.Unicode)]
+    public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
+
+    public const uint SHGSI_ICON = 0x00000100;
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct SHSTOCKICONINFO
+    {
+        public uint cbSize;
+        public IntPtr hIcon;
+        public int iSysImageIndex;
+        public int iIcon;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] public string szPath;
+    }
+
+    [DllImport("shell32.dll")]
+    public static extern int SHGetStockIconInfo(int siid, uint uFlags, ref SHSTOCKICONINFO psii);
+
     // ---- Fullscreen detection ----
     public const int GWL_STYLE = -16;
     public const uint WS_CAPTION = 0x00C00000;

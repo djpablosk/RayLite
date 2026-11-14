@@ -9,6 +9,9 @@ internal static class ProcessLauncher
 {
     public static bool Open(IndexEntry entry)
     {
+        if (entry.Kind == EntryKind.SystemCommand)
+            return SystemCommandService.Execute(entry.Path);
+
         try
         {
             ProcessStartInfo psi = entry.Kind == EntryKind.UwpApp

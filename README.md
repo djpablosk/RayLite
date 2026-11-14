@@ -44,6 +44,17 @@ Download `RayLite.exe` from the Releases page and run it from anywhere. Settings
 | Open selected item | <kbd>Enter</kbd> or click |
 | Hide launcher | <kbd>Esc</kbd> or click outside |
 
+### System commands
+Type a keyword to run a built-in action; commands rank first on an exact or prefix match (3+ characters):
+
+| Command | Keywords | Notes |
+|---|---|---|
+| Lock | `lock`, `zamknut` | Locks the workstation |
+| Sleep | `sleep`, `rezim spanku`, `uspat` | Suspends the PC |
+| Restart | `restart`, `reboot`, `restartovat` | Asks for confirmation |
+| Shutdown | `shutdown`, `vypnut`, `power off` | Asks for confirmation |
+| Empty Recycle Bin | `empty recycle bin`, `trash`, `bin`, `kos`, `vysypat kos` | Runs immediately, no prompt |
+
 **Tray icon (right-click):** Open · Settings · Rebuild index · Exit.
 
 ### Settings

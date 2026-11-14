@@ -16,13 +16,19 @@ public sealed class ResultItem
 
     public string Name => Entry.Name;
 
-    public string Detail => Entry.Kind == EntryKind.UwpApp ? "Windows app" : Entry.Path;
+    public string Detail => Entry.Kind switch
+    {
+        EntryKind.UwpApp => "Windows app",
+        EntryKind.SystemCommand => SystemCommandService.GetSubtitle(Entry.Path),
+        _ => Entry.Path
+    };
 
     public string TypeLabel => Entry.Kind switch
     {
         EntryKind.Application => "Application",
         EntryKind.UwpApp => "App",
         EntryKind.Folder => "Folder",
+        EntryKind.SystemCommand => "Command",
         _ => "File"
     };
 
